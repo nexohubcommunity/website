@@ -48,7 +48,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 1rem;
         padding: 1rem 0;
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       .logo {
@@ -58,6 +65,9 @@
       }
 
       .pill {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
         border: 1px solid var(--accent);
         color: var(--text);
         padding: 0.4rem 0.8rem;
@@ -171,11 +181,34 @@
         opacity: 0.9;
       }
 
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+
       footer {
         border-top: 1px solid var(--line);
         color: var(--muted);
         padding: 1rem 0 2rem;
         font-size: 0.85rem;
+      }
+
+      .auth-status {
+        margin: 1rem 0;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .auth-status p {
+        margin: 0;
+        color: var(--muted);
       }
 
       code {
@@ -190,11 +223,20 @@
     <header>
       <div class="container nav">
         <div class="logo">Nexo Hub</div>
-        <div class="pill">Script Hub</div>
+        <div class="nav-actions">
+          <a class="pill" href="/login.html">Login</a>
+          <a class="pill" href="/signup.html">Sign Up</a>
+          <div class="pill">Script Hub</div>
+        </div>
       </div>
     </header>
 
     <main class="container">
+      <section class="auth-status">
+        <p id="auth-status-text">Checking authentication status...</p>
+        <button class="btn secondary" id="sign-out-btn" type="button" hidden>Sign Out</button>
+      </section>
+
       <section class="hero">
         <h1>Next-Generation Exploit Xecution Operations</h1>
         <p>
@@ -242,6 +284,11 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
       import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+      import {
         initializePerformance,
         trace,
       } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-performance.js";
@@ -267,10 +314,13 @@
         dataCollectionEnabled: true,
         instrumentationEnabled: true,
       });
+      const auth = getAuth(app);
       const db = getFirestore(app);
 
       const projectBadge = document.getElementById("project-badge");
       const scriptList = document.getElementById("script-list");
+      const authStatusText = document.getElementById("auth-status-text");
+      const signOutButton = document.getElementById("sign-out-btn");
 
       const defaultScripts = [
         {
@@ -338,6 +388,20 @@
           loadScriptsTrace.stop();
         }
       }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          authStatusText.textContent = `Signed in as ${user.email || user.phoneNumber || "anonymous user"}.`;
+          signOutButton.hidden = false;
+        } else {
+          authStatusText.textContent = "You are not signed in. Login or sign up to connect your account.";
+          signOutButton.hidden = true;
+        }
+      });
+
+      signOutButton.addEventListener("click", async () => {
+        await signOut(auth);
+      });
 
       loadScripts();
     </script>
