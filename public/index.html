@@ -282,14 +282,29 @@
         items.forEach((script) => {
           const card = document.createElement("article");
           card.className = "card";
-          card.innerHTML = `
-            <h3>${script.name}</h3>
-            <p>${script.description}</p>
-            <div class="tags">
-              ${(script.tags || []).map((tag) => `<span class="tag">${tag}</span>`).join("")}
-            </div>
-            <button class="btn" type="button">Run Script</button>
-          `;
+
+          const title = document.createElement("h3");
+          title.textContent = String(script.name || "Untitled Script");
+
+          const description = document.createElement("p");
+          description.textContent = String(script.description || "No description provided.");
+
+          const tags = document.createElement("div");
+          tags.className = "tags";
+          const tagList = Array.isArray(script.tags) ? script.tags : [];
+          tagList.forEach((tag) => {
+            const tagElement = document.createElement("span");
+            tagElement.className = "tag";
+            tagElement.textContent = String(tag);
+            tags.appendChild(tagElement);
+          });
+
+          const button = document.createElement("button");
+          button.className = "btn";
+          button.type = "button";
+          button.textContent = "Run Script";
+
+          card.append(title, description, tags, button);
           scriptList.appendChild(card);
         });
       }
