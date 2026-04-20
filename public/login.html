@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexo Hub | Login</title>
+    <style>
+      :root {
+        --bg: #000;
+        --panel: #0f0f0f;
+        --text: #fff;
+        --muted: #bdbdbd;
+        --line: #2b2b2b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top, #1a1a1a 0%, #000 50%);
+        min-height: 100vh;
+      }
+
+      .container {
+        width: min(820px, 92vw);
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding: 1rem 0;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #fff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0.4rem 0 0.6rem;
+      }
+
+      p.subtitle {
+        margin: 0 0 1.4rem;
+        color: var(--muted);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding-bottom: 2rem;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 1rem;
+      }
+
+      .provider-list {
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      .provider-list div {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.6rem 0.75rem;
+      }
+
+      form {
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      label {
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        background: #0a0a0a;
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.65rem 0.75rem;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        border-radius: 10px;
+        background: #fff;
+        color: #000;
+        font-weight: 700;
+        padding: 0.6rem 0.85rem;
+      }
+
+      .status {
+        margin-top: 0.7rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .recaptcha {
+        margin-top: 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <nav class="topbar">
+        <a class="pill" href="/index.html">Home</a>
+        <a class="pill" href="/signup.html">Sign Up</a>
+      </nav>
+
+      <h1>Login</h1>
+      <p class="subtitle">Sign in with Email/Password, Email Link (passwordless), Phone, or Anonymous.</p>
+
+      <section class="layout">
+        <article class="panel">
+          <h2>Sign-in Providers</h2>
+          <div class="provider-list">
+            <div>Email/Password</div>
+            <div>Phone</div>
+            <div>Anonymous</div>
+            <div>Email Link (Passwordless)</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Email + Password</h2>
+          <form id="email-login-form">
+            <label for="email-login">Email</label>
+            <input id="email-login" name="email" type="email" autocomplete="email" required />
+            <label for="password-login">Password</label>
+            <input id="password-login" name="password" type="password" autocomplete="current-password" required />
+            <button type="submit">Login</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h2>Email Link (Passwordless)</h2>
+          <form id="email-link-form">
+            <label for="email-link">Email</label>
+            <input id="email-link" name="email" type="email" autocomplete="email" required />
+            <button type="submit">Send Sign-In Link</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h2>Phone</h2>
+          <form id="phone-login-form">
+            <label for="phone-number">Phone Number (E.164 format)</label>
+            <input id="phone-number" name="phone" type="tel" placeholder="+15551234567" required />
+            <button type="button" id="send-otp-btn">Send OTP</button>
+            <label for="otp-code">OTP Code</label>
+            <input id="otp-code" name="otp" type="text" placeholder="123456" />
+            <button type="button" id="verify-otp-btn">Verify OTP</button>
+          </form>
+          <div id="recaptcha-container" class="recaptcha"></div>
+        </article>
+
+        <article class="panel">
+          <h2>Anonymous</h2>
+          <button id="anonymous-btn" type="button">Continue as Guest</button>
+        </article>
+
+        <article class="panel">
+          <h2>Status</h2>
+          <div id="status" class="status">Waiting for action...</div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+      import {
+        getAuth,
+        setPersistence,
+        browserLocalPersistence,
+        signInWithEmailAndPassword,
+        sendSignInLinkToEmail,
+        isSignInWithEmailLink,
+        signInWithEmailLink,
+        RecaptchaVerifier,
+        signInWithPhoneNumber,
+        signInAnonymously,
+      } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAMJk2z0CSSmnh-CG5J0ibvwiCZUU5hlEE",
+        authDomain: "nexo-hub-ab3ab.firebaseapp.com",
+        projectId: "nexo-hub-ab3ab",
+        storageBucket: "nexo-hub-ab3ab.firebasestorage.app",
+        messagingSenderId: "1047400625373",
+        appId: "1:1047400625373:web:71ae25fbe6d4417b7c1734",
+        measurementId: "G-HGD7STBNK8",
+      };
+
+      const EMAIL_LINK_STORAGE_KEY = "nexoEmailForSignIn";
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      await setPersistence(auth, browserLocalPersistence);
+
+      const status = document.getElementById("status");
+      const emailLoginForm = document.getElementById("email-login-form");
+      const emailLinkForm = document.getElementById("email-link-form");
+      const phoneInput = document.getElementById("phone-number");
+      const otpInput = document.getElementById("otp-code");
+      const sendOtpButton = document.getElementById("send-otp-btn");
+      const verifyOtpButton = document.getElementById("verify-otp-btn");
+      const anonymousButton = document.getElementById("anonymous-btn");
+
+      const actionCodeSettings = {
+        url: `${window.location.origin}/login.html`,
+        handleCodeInApp: true,
+      };
+
+      let phoneConfirmationResult;
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "normal",
+      });
+
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        let email = window.localStorage.getItem(EMAIL_LINK_STORAGE_KEY);
+        if (!email) {
+          email = window.prompt("Please confirm your email for sign-in");
+        }
+
+        if (email) {
+          try {
+            await signInWithEmailLink(auth, email, window.location.href);
+            window.localStorage.removeItem(EMAIL_LINK_STORAGE_KEY);
+            setStatus("Passwordless sign-in complete. Redirecting...");
+            window.location.assign("/index.html");
+          } catch (error) {
+            setStatus(`Email link sign-in failed: ${error.message}`);
+          }
+        }
+      }
+
+      emailLoginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(emailLoginForm);
+        const email = String(formData.get("email") || "").trim();
+        const password = String(formData.get("password") || "");
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          setStatus("Email/password login successful. Redirecting...");
+          window.location.assign("/index.html");
+        } catch (error) {
+          setStatus(`Email/password login failed: ${error.message}`);
+        }
+      });
+
+      emailLinkForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(emailLinkForm);
+        const email = String(formData.get("email") || "").trim();
+
+        try {
+          await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+          window.localStorage.setItem(EMAIL_LINK_STORAGE_KEY, email);
+          setStatus("Passwordless sign-in link sent. Check your inbox.");
+        } catch (error) {
+          setStatus(`Could not send email link: ${error.message}`);
+        }
+      });
+
+      sendOtpButton.addEventListener("click", async () => {
+        const phoneNumber = phoneInput.value.trim();
+
+        try {
+          phoneConfirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+          setStatus("OTP sent. Enter code to verify.");
+        } catch (error) {
+          setStatus(`Phone sign-in failed to send OTP: ${error.message}`);
+        }
+      });
+
+      verifyOtpButton.addEventListener("click", async () => {
+        const code = otpInput.value.trim();
+        if (!phoneConfirmationResult) {
+          setStatus("Send OTP first.");
+          return;
+        }
+
+        try {
+          await phoneConfirmationResult.confirm(code);
+          setStatus("Phone login successful. Redirecting...");
+          window.location.assign("/index.html");
+        } catch (error) {
+          setStatus(`Phone OTP verification failed: ${error.message}`);
+        }
+      });
+
+      anonymousButton.addEventListener("click", async () => {
+        try {
+          await signInAnonymously(auth);
+          setStatus("Signed in anonymously. Redirecting...");
+          window.location.assign("/index.html");
+        } catch (error) {
+          setStatus(`Anonymous sign-in failed: ${error.message}`);
+        }
+      });
+    </script>
+  </body>
+</html>
