@@ -126,8 +126,8 @@
   <body>
     <main class="container">
       <nav class="topbar">
-        <a class="pill" href="/index.html">Home</a>
-        <a class="pill" href="/signup.html">Sign Up</a>
+        <a class="pill" href="/">Home</a>
+        <a class="pill" href="/signup">Sign Up</a>
       </nav>
 
       <h1>Login</h1>
@@ -229,7 +229,7 @@
       const verifyOtpButton = document.getElementById("verify-otp-btn");
       const anonymousButton = document.getElementById("anonymous-btn");
 
-      const continueUrl = `https://${firebaseConfig.authDomain}/login.html`;
+      const continueUrl = `https://nexo-hub-community.web.app/login`;
       const actionCodeSettings = {
         url: continueUrl,
         handleCodeInApp: true,
@@ -256,7 +256,7 @@
             await signInWithEmailLink(auth, email, window.location.href);
             window.localStorage.removeItem(EMAIL_LINK_STORAGE_KEY);
             setStatus("Passwordless sign-in complete. Redirecting...");
-            window.location.assign("/index.html");
+            window.location.assign("/");
           } catch (error) {
             setStatus(`Email link sign-in failed: ${error.message}`);
           }
@@ -272,7 +272,7 @@
         try {
           await signInWithEmailAndPassword(auth, email, password);
           setStatus("Email/password login successful. Redirecting...");
-          window.location.assign("/index.html");
+          window.location.assign("/");
         } catch (error) {
           setStatus(`Email/password login failed: ${error.message}`);
         }
@@ -313,7 +313,7 @@
         try {
           await phoneConfirmationResult.confirm(code);
           setStatus("Phone login successful. Redirecting...");
-          window.location.assign("/index.html");
+          window.location.assign("/");
         } catch (error) {
           setStatus(`Phone OTP verification failed: ${error.message}`);
         }
@@ -323,7 +323,7 @@
         try {
           await signInAnonymously(auth);
           setStatus("Signed in anonymously. Redirecting...");
-          window.location.assign("/index.html");
+          window.location.assign("/");
         } catch (error) {
           setStatus(`Anonymous sign-in failed: ${error.message}`);
         }

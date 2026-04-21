@@ -3,6 +3,6 @@
     "site": "nexo-hub-community",
     "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    "cleanUrls": true
   }
 }
