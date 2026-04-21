@@ -157,6 +157,10 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
       import {
+        initializeAppCheck,
+        ReCaptchaV3Provider,
+      } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app-check.js";
+      import {
         getAuth,
         setPersistence,
         browserLocalPersistence,
@@ -174,9 +178,16 @@
         measurementId: "G-HGD7STBNK8",
       };
 
+      const appCheckSiteKey = "6LdDp8AsAAAAAD5s9ie31k302Z9YGtdIjd5S5Eon";
       const EMAIL_LINK_STORAGE_KEY = "nexoEmailForSignIn";
 
       const app = initializeApp(firebaseConfig);
+      if (appCheckSiteKey) {
+        initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(appCheckSiteKey),
+          isTokenAutoRefreshEnabled: true,
+        });
+      }
       const auth = getAuth(app);
       await setPersistence(auth, browserLocalPersistence);
 
