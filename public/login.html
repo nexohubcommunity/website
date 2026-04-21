@@ -229,8 +229,9 @@
       const verifyOtpButton = document.getElementById("verify-otp-btn");
       const anonymousButton = document.getElementById("anonymous-btn");
 
+      const continueUrl = `https://${firebaseConfig.authDomain}/login.html`;
       const actionCodeSettings = {
-        url: `${window.location.origin}/login.html`,
+        url: continueUrl,
         handleCodeInApp: true,
       };
 
