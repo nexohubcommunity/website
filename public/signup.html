@@ -184,8 +184,9 @@
       const emailLinkForm = document.getElementById("email-link-form");
       const status = document.getElementById("status");
 
+      const continueUrl = `https://${firebaseConfig.authDomain}/login.html`;
       const actionCodeSettings = {
-        url: `${window.location.origin}/login.html`,
+        url: continueUrl,
         handleCodeInApp: true,
       };
 
