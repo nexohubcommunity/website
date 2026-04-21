@@ -117,8 +117,8 @@
   <body>
     <main class="container">
       <nav class="topbar">
-        <a class="pill" href="/index.html">Home</a>
-        <a class="pill" href="/login.html">Login</a>
+        <a class="pill" href="/">Home</a>
+        <a class="pill" href="/login">Login</a>
       </nav>
 
       <h1>Sign Up</h1>
@@ -184,7 +184,7 @@
       const emailLinkForm = document.getElementById("email-link-form");
       const status = document.getElementById("status");
 
-      const continueUrl = `https://${firebaseConfig.authDomain}/login.html`;
+      const continueUrl = `https://nexo-hub-community.web.app/login`;
       const actionCodeSettings = {
         url: continueUrl,
         handleCodeInApp: true,
@@ -203,7 +203,7 @@
         try {
           await createUserWithEmailAndPassword(auth, email, password);
           setStatus("Signup successful. Redirecting...");
-          window.location.assign("/index.html");
+          window.location.assign("/");
         } catch (error) {
           setStatus(`Signup failed: ${error.message}`);
         }
