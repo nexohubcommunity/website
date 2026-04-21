@@ -219,10 +219,16 @@
       };
 
       const appCheckSiteKey = "6LdDp8AsAAAAAD5s9ie31k302Z9YGtdIjd5S5Eon";
+      const appCheckAllowedHosts = new Set([
+        "nexo-hub-community.web.app",
+        "nexo-hub-community.firebaseapp.com",
+      ]);
       const EMAIL_LINK_STORAGE_KEY = "nexoEmailForSignIn";
 
       const app = initializeApp(firebaseConfig);
-      if (appCheckSiteKey) {
+      const shouldEnableAppCheck =
+        Boolean(appCheckSiteKey) && appCheckAllowedHosts.has(window.location.hostname);
+      if (shouldEnableAppCheck) {
         initializeAppCheck(app, {
           provider: new ReCaptchaV3Provider(appCheckSiteKey),
           isTokenAutoRefreshEnabled: true,
