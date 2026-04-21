@@ -211,6 +211,12 @@
         color: var(--muted);
       }
 
+      .auth-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       code {
         background: #111;
         border: 1px solid var(--line);
@@ -224,8 +230,6 @@
       <div class="container nav">
         <div class="logo">Nexo Hub</div>
         <div class="nav-actions">
-          <a class="pill" href="/login">Login</a>
-          <a class="pill" href="/signup">Sign Up</a>
           <div class="pill">Script Hub</div>
         </div>
       </div>
@@ -234,7 +238,11 @@
     <main class="container">
       <section class="auth-status">
         <p id="auth-status-text">Checking authentication status...</p>
-        <button class="btn secondary" id="sign-out-btn" type="button" hidden>Sign Out</button>
+        <div class="auth-actions">
+          <a class="pill" href="/login" id="inline-login-btn" hidden>Login</a>
+          <a class="pill" href="/signup" id="inline-signup-btn" hidden>Sign Up</a>
+          <button class="btn secondary" id="sign-out-btn" type="button" hidden>Sign Out</button>
+        </div>
       </section>
 
       <section class="hero">
@@ -320,6 +328,8 @@
       const projectBadge = document.getElementById("project-badge");
       const scriptList = document.getElementById("script-list");
       const authStatusText = document.getElementById("auth-status-text");
+      const inlineLoginButton = document.getElementById("inline-login-btn");
+      const inlineSignupButton = document.getElementById("inline-signup-btn");
       const signOutButton = document.getElementById("sign-out-btn");
 
       const defaultScripts = [
@@ -392,9 +402,13 @@
       onAuthStateChanged(auth, (user) => {
         if (user) {
           authStatusText.textContent = `Signed in as ${user.email || user.phoneNumber || "anonymous user"}.`;
+          inlineLoginButton.hidden = true;
+          inlineSignupButton.hidden = true;
           signOutButton.hidden = false;
         } else {
           authStatusText.textContent = "You are not signed in. Login or sign up to connect your account.";
+          inlineLoginButton.hidden = false;
+          inlineSignupButton.hidden = false;
           signOutButton.hidden = true;
         }
       });
